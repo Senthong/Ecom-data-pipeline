@@ -1,0 +1,107 @@
+version: 2
+
+models:
+  #  Staging 
+  - name: stg_orders
+    description: Cleaned orders with lifecycle timestamps and derived flags
+    columns:
+      - name: order_id
+        tests: [unique, not_null]
+      - name: customer_id
+        tests: [not_null]
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['delivered','shipped','canceled','unavailable',
+                       'invoiced','processing','approved','created']
+      - name: order_date
+        tests: [not_null]
+
+  - name: stg_order_items
+    columns:
+      - name: order_id
+        tests: [not_null]
+      - name: item_price
+        tests:
+          - not_null
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+      - name: freight_value
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: stg_customers
+    columns:
+      - name: customer_id
+        tests: [unique, not_null]
+
+  - name: stg_sellers
+    columns:
+      - name: seller_id
+        tests: [unique, not_null]
+
+  - name: stg_products
+    columns:
+      - name: product_id
+        tests: [unique, not_null]
+
+  - name: stg_order_payments
+    columns:
+      - name: payment_value
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: stg_order_reviews
+    columns:
+      - name: review_score
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+
+  #  Mart 
+  - name: revenue_daily
+    description: Daily GMV, order counts, and delivery quality metrics
+    columns:
+      - name: order_date
+        tests: [unique, not_null]
+      - name: total_orders
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "> 0"
+      - name: gmv
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+
+  - name: seller_performance
+    description: Per-seller scorecard with revenue, review score, delivery KPIs
+    columns:
+      - name: seller_id
+        tests: [unique, not_null]
+      - name: seller_score
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "between 0 and 100"
+
+  - name: fct_customer_cohorts
+    description: Monthly cohort retention rates
+    columns:
+      - name: cohort_month
+        tests: [not_null]
+      - name: months_since_first_order
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: ">= 0"
+      - name: retention_rate_pct
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "between 0 and 100"
+
+  - name: category_revenue_monthly
+    columns:
+      - name: order_month
+        tests: [not_null]
+      - name: category_en
+        tests: [not_null]

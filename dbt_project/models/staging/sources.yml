@@ -1,0 +1,84 @@
+version: 2
+
+sources:
+  - name: olist_raw
+    description: >
+      Raw Olist Brazilian E-Commerce data loaded from S3 into Redshift staging schema
+      via Python COPY commands. Refreshed daily.
+    schema: staging
+    database: ecom_db
+    loader: "python-redshift-copy"
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 25, period: hour}
+      error_after: {count: 49, period: hour}
+
+    tables:
+      - name: raw_orders
+        description: One row per order. Contains order lifecycle timestamps.
+        columns:
+          - name: order_id
+            description: Unique order identifier
+            tests:
+              - unique
+              - not_null
+          - name: customer_id
+            tests: [not_null]
+          - name: order_status
+            tests:
+              - accepted_values:
+                  values: ['delivered', 'shipped', 'canceled', 'unavailable',
+                           'invoiced', 'processing', 'approved', 'created']
+
+      - name: raw_order_items
+        description: Line-level items per order. One row per (order_id, order_item_id).
+        columns:
+          - name: order_id
+            tests: [not_null]
+          - name: price
+            tests: [not_null]
+          - name: freight_value
+            tests: [not_null]
+
+      - name: raw_customers
+        description: Customer dimension. customer_unique_id is the person; customer_id is per-order.
+        columns:
+          - name: customer_id
+            tests:
+              - unique
+              - not_null
+
+      - name: raw_sellers
+        columns:
+          - name: seller_id
+            tests:
+              - unique
+              - not_null
+
+      - name: raw_products
+        columns:
+          - name: product_id
+            tests:
+              - unique
+              - not_null
+
+      - name: raw_order_payments
+        columns:
+          - name: order_id
+            tests: [not_null]
+          - name: payment_type
+            tests:
+              - accepted_values:
+                  values: ['credit_card', 'boleto', 'voucher', 'debit_card', 'not_defined']
+
+      - name: raw_order_reviews
+        columns:
+          - name: review_score
+            tests:
+              - accepted_values:
+                  values: [1, 2, 3, 4, 5]
+
+      - name: raw_category_translation
+        columns:
+          - name: product_category_name_english
+            tests: [not_null]

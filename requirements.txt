@@ -1,0 +1,30 @@
+# Python dependencies for ingestion scripts and local development
+# Install: pip install -r requirements.txt
+
+# AWS
+boto3==1.34.0
+botocore==1.34.0
+
+# Data processing
+pandas==2.1.4
+numpy==1.26.3
+
+# Redshift
+redshift-connector==2.0.918
+psycopg2-binary==2.9.9
+
+# dbt
+dbt-core==1.7.3
+dbt-redshift==1.7.1
+
+# Kaggle dataset download
+kaggle==1.6.3
+
+# Airflow (for local testing — full install via Docker)
+apache-airflow==2.8.1
+
+# Dev / linting
+black==24.1.1
+flake8==7.0.0
+isort==5.13.2
+pytest==8.0.0

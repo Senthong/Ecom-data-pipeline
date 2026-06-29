@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+
+# Airflow
+logs/
+airflow.db
+airflow.cfg
+
+# Terraform
+infrastructure/terraform/.terraform/
+infrastructure/terraform/*.tfstate
+infrastructure/terraform/*.tfstate.backup
+infrastructure/terraform/*.tfvars
+infrastructure/terraform/.terraform.lock.hcl
+
+# Secrets
+.env
+*.pem
+*.key
+kaggle.json
+credentials.json
+
+# Data files (large CSVs)
+/tmp/
+data/raw/*.csv
+data/raw/*.zip
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+.DS_Store

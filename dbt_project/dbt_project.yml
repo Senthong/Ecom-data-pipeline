@@ -1,0 +1,57 @@
+name: 'ecom_pipeline'
+version: '1.0.0'
+config-version: 2
+
+profile: 'ecom_pipeline'
+
+model-paths: ["models"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+target-path: "target"
+clean-targets:
+  - "target"
+  - "dbt_packages"
+
+# 
+# Model configs per layer
+# 
+models:
+  ecom_pipeline:
+    staging:
+      +materialized: view
+      +schema: staging
+      +tags: ["staging"]
+
+    intermediate:
+      +materialized: ephemeral
+      +tags: ["intermediate"]
+
+    mart:
+      +materialized: table
+      +schema: mart
+      +tags: ["mart"]
+      +post-hook:
+        - "GRANT SELECT ON {{ this }} TO GROUP analysts"
+
+      finance:
+        +materialized: table
+        revenue_daily:
+          +sort: ["order_date"]
+          +dist: "order_date"
+
+      customers:
+        +materialized: table
+        fct_customer_cohorts:
+          +sort: ["cohort_month"]
+
+      operations:
+        +materialized: table
+
+vars:
+  # Used to filter data in development so dbt runs fast locally
+  start_date: '2016-01-01'
+  # Override in prod: dbt run --vars '{"start_date": "2016-01-01"}'
