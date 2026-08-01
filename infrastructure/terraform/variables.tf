@@ -19,7 +19,7 @@ variable "environment" {
 variable "redshift_db_name" {
   description = "Redshift database name"
   type        = string
-  default     = "ecom_db"
+  default     = "dev"
 }
 
 variable "redshift_admin_user" {

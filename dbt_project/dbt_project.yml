@@ -34,8 +34,6 @@ models:
       +materialized: table
       +schema: mart
       +tags: ["mart"]
-      +post-hook:
-        - "GRANT SELECT ON {{ this }} TO GROUP analysts"
 
       finance:
         +materialized: table

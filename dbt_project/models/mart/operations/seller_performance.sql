@@ -37,8 +37,8 @@ seller_revenue as (
         round(sum(i.item_price), 2)         as total_gmv,
         round(avg(i.item_price), 2)         as avg_item_price,
         round(sum(i.freight_value), 2)      as total_freight,
-        min(o.order_date)                   as first_order_date,
-        max(o.order_date)                   as last_order_date
+        min(o.order_date)                  as first_order_date,
+        max(o.order_date)                  as last_order_date
     from items i
     join orders o on i.order_id = o.order_id
     group by 1
@@ -49,19 +49,19 @@ seller_reviews as (
     select
         i.seller_id,
         round(avg(r.review_score), 2)       as avg_review_score,
-        count(r.review_id)                  as total_reviews,
-        sum(case when r.sentiment = 'negative' then 1 else 0 end) as negative_reviews
+        count(distinct r.review_id)         as total_reviews,
+        count(distinct case when r.sentiment = 'negative' then r.review_id end) as negative_reviews
     from items i
     join reviews r on i.order_id = r.order_id
     group by 1
 ),
 
--- delivery performance per seller
+-- delivery performance per seller (sửa lại đếm distinct order_id)
 seller_delivery as (
     select
         i.seller_id,
-        count(distinct o.order_id)           as delivered_orders,
-        sum(case when o.is_late_delivery then 1 else 0 end) as late_deliveries
+        count(distinct o.order_id) as delivered_orders,
+        count(distinct case when o.is_late_delivery then o.order_id end) as late_deliveries
     from items i
     join orders o on i.order_id = o.order_id
     where o.is_delivered = true
@@ -77,7 +77,7 @@ final as (
         -- Revenue
         coalesce(r.total_orders, 0)                         as total_orders,
         coalesce(r.total_items_sold, 0)                     as total_items_sold,
-        coalesce(r.total_gmv, 0)                            as total_gmv,
+        coalesce(r.total_gmv, 0)                             as total_gmv,
         coalesce(r.avg_item_price, 0)                       as avg_item_price,
         r.first_order_date,
         r.last_order_date,
@@ -101,7 +101,7 @@ final as (
         -- Composite score: simple weighted rank signal (0–100)
         round(
             (coalesce(rv.avg_review_score, 3) / 5.0 * 50)   -- 50% weight on reviews
-            + (1 - coalesce(d.late_deliveries, 0)
+            + (1.0 - coalesce(d.late_deliveries, 0)::float 
                 / nullif(coalesce(d.delivered_orders, 1), 0)) * 50,  -- 50% on on-time
             1
         )                                                   as seller_score,

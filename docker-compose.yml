@@ -10,6 +10,8 @@ x-airflow-common: &airflow-common
     AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: 'true'
     AIRFLOW__CORE__LOAD_EXAMPLES: 'false'
     AIRFLOW__API__AUTH_BACKENDS: 'airflow.api.auth.backend.basic_auth'
+    KAGGLE_USERNAME: "thongdang111"
+    KAGGLE_KEY: "820baffb2061845ef05b6457f26966cb"
     # AWS
     AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
     AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
@@ -27,7 +29,7 @@ x-airflow-common: &airflow-common
       psycopg2-binary==2.9.9
       dbt-core==1.7.3
       dbt-redshift==1.7.1
-      redshift-connector==2.0.918
+      redshift-connector==2.0.915
       kaggle==1.6.3
   volumes:
     - ./airflow/dags:/opt/airflow/dags

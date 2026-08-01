@@ -1,15 +1,15 @@
-# 🛒 E-Commerce Data Pipeline — End-to-End Analytics Platform
+# E-Commerce Data Pipeline — End-to-End Analytics Platform
 
 > **Junior Data Engineer Portfolio Project**
 > Stack: Python · dbt · Apache Airflow · Docker · AWS (S3, Redshift, Glue)
 
 ---
 
-## 📌 Project Overview
+##Project Overview
 
 A production-grade data pipeline that ingests raw e-commerce data from the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (100k+ real orders), transforms it through a medallion architecture (Bronze → Silver → Gold), and serves analytics-ready tables via a dbt data warehouse on AWS Redshift.
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 [Olist CSV / Kaggle API]
@@ -36,7 +36,7 @@ A production-grade data pipeline that ingests raw e-commerce data from the [Braz
 [Apache Airflow — Orchestration]
 ```
 
-## 📦 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -49,7 +49,7 @@ A production-grade data pipeline that ingests raw e-commerce data from the [Braz
 | IaC | Terraform |
 | CI/CD | GitHub Actions |
 
-## 📊 Dataset: Olist Brazilian E-Commerce
+## Dataset: Olist Brazilian E-Commerce
 
 Real-world e-commerce dataset with 100k+ orders from 2016–2018:
 - `olist_orders_dataset.csv` — order lifecycle
@@ -61,18 +61,18 @@ Real-world e-commerce dataset with 100k+ orders from 2016–2018:
 - `olist_order_reviews_dataset.csv` — customer reviews
 - `olist_geolocation_dataset.csv` — Brazilian zip codes
 
-## 🚀 Quick Start
+## Quick Start
 
 ```bash
 git clone https://github.com/senthong/ecom-data-pipeline
 cd ecom-data-pipeline
-cp .env.example .env  # fill in your AWS credentials
+cp .env.example .env 
 docker compose up -d
 ```
 
 Then open Airflow UI at http://localhost:8080 and trigger `ecom_full_pipeline_dag`.
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ecom-data-pipeline/
@@ -85,7 +85,7 @@ ecom-data-pipeline/
 └ README.md
 ```
 
-## 📈 Key Business Metrics Produced
+## Key Business Metrics Produced
 
 - **Daily Revenue Report** — GMV by day, week, month
 - **Seller Performance** — top sellers by revenue & review score
@@ -94,7 +94,7 @@ ecom-data-pipeline/
 - **Order Funnel** — conversion from placed → approved → delivered
 - **Late Delivery Rate** — % orders delivered after estimated date
 
-## 🎯 Skills Demonstrated
+## Skills Demonstrated
 
 - Designing a multi-layer data warehouse (medallion architecture)
 - Writing modular, tested dbt models with ref() and sources

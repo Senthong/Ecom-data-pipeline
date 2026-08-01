@@ -7,7 +7,7 @@ ecom_pipeline:
       port: "{{ env_var('REDSHIFT_PORT', '5439') | int }}"
       user: "{{ env_var('REDSHIFT_USER') }}"
       password: "{{ env_var('REDSHIFT_PASSWORD') }}"
-      dbname: "{{ env_var('REDSHIFT_DATABASE', 'ecom_db') }}"
+      dbname: "{{ env_var('REDSHIFT_DATABASE', 'dev') }}"
       schema: analytics_dev
       threads: 4
       ra3_node: true       # enables cross-database queries on Redshift
@@ -19,7 +19,7 @@ ecom_pipeline:
       port: "{{ env_var('REDSHIFT_PORT', '5439') | int }}"
       user: "{{ env_var('REDSHIFT_USER') }}"
       password: "{{ env_var('REDSHIFT_PASSWORD') }}"
-      dbname: "{{ env_var('REDSHIFT_DATABASE', 'ecom_db') }}"
+      dbname: "{{ env_var('REDSHIFT_DATABASE', 'dev') }}"
       schema: analytics
       threads: 8
       ra3_node: true

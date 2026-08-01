@@ -63,7 +63,7 @@ jobs:
           DBT_PROFILES_DIR: .
           REDSHIFT_HOST: "dummy.host"
           REDSHIFT_PORT: "5439"
-          REDSHIFT_DATABASE: "ecom_db"
+          REDSHIFT_DATABASE: "dev"
           REDSHIFT_USER: "ci_user"
           REDSHIFT_PASSWORD: "ci_password"
         run: dbt compile --target dev

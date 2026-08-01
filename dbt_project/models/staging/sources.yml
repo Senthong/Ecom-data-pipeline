@@ -6,7 +6,7 @@ sources:
       Raw Olist Brazilian E-Commerce data loaded from S3 into Redshift staging schema
       via Python COPY commands. Refreshed daily.
     schema: staging
-    database: ecom_db
+    database: dev
     loader: "python-redshift-copy"
     loaded_at_field: _loaded_at
     freshness:

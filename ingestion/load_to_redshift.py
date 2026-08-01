@@ -28,7 +28,7 @@ S3_BUCKET = os.environ.get("S3_RAW_BUCKET", "ecom-pipeline-raw-dev")
 REDSHIFT_CONFIG = {
     "host": os.environ["REDSHIFT_HOST"],
     "port": int(os.environ.get("REDSHIFT_PORT", 5439)),
-    "database": os.environ.get("REDSHIFT_DATABASE", "ecom_db"),
+    "database": os.environ.get("REDSHIFT_DATABASE", "dev"),
     "user": os.environ["REDSHIFT_USER"],
     "password": os.environ["REDSHIFT_PASSWORD"],
 }
@@ -40,17 +40,21 @@ IAM_ROLE_ARN = os.environ.get("REDSHIFT_IAM_ROLE_ARN", "")  # preferred over key
 @dataclass
 class TableSpec:
     """Defines how each CSV maps to a Redshift table."""
+
     csv_file: str
     table_name: str
+    columns: str  # Tên các cột trong CSV (bỏ qua _loaded_at)
     ddl: str
     sort_key: Optional[str] = None
     dist_key: Optional[str] = None
+
 
 # TABLE DEFINITIONS (DDL)
 TABLE_SPECS = [
     TableSpec(
         csv_file="olist_customers_dataset.csv",
         table_name="raw_customers",
+        columns="customer_id, customer_unique_id, customer_zip_code, customer_city, customer_state",
         sort_key="customer_id",
         dist_key="customer_id",
         ddl="""
@@ -59,7 +63,7 @@ TABLE_SPECS = [
             customer_unique_id VARCHAR(64),
             customer_zip_code  VARCHAR(10),
             customer_city      VARCHAR(100),
-            customer_state     CHAR(2),
+            customer_state     VARCHAR(10),
             _loaded_at         TIMESTAMP    DEFAULT GETDATE()
         )
         DISTSTYLE KEY DISTKEY(customer_id)
@@ -69,6 +73,7 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="olist_orders_dataset.csv",
         table_name="raw_orders",
+        columns="order_id, customer_id, order_status, order_purchase_timestamp, order_approved_at, order_delivered_carrier_date, order_delivered_customer_date, order_estimated_delivery_date",
         sort_key="order_purchase_timestamp",
         dist_key="order_id",
         ddl="""
@@ -90,6 +95,7 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="olist_order_items_dataset.csv",
         table_name="raw_order_items",
+        columns="order_id, order_item_id, product_id, seller_id, shipping_limit_date, price, freight_value",
         dist_key="order_id",
         ddl="""
         CREATE TABLE IF NOT EXISTS {schema}.raw_order_items (
@@ -108,6 +114,7 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="olist_order_payments_dataset.csv",
         table_name="raw_order_payments",
+        columns="order_id, payment_sequential, payment_type, payment_installments, payment_value",
         dist_key="order_id",
         ddl="""
         CREATE TABLE IF NOT EXISTS {schema}.raw_order_payments (
@@ -124,6 +131,7 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="olist_order_reviews_dataset.csv",
         table_name="raw_order_reviews",
+        columns="review_id, order_id, review_score, review_comment_title, review_comment_message, review_creation_date, review_answer_timestamp",
         dist_key="order_id",
         ddl="""
         CREATE TABLE IF NOT EXISTS {schema}.raw_order_reviews (
@@ -142,6 +150,7 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="olist_products_dataset.csv",
         table_name="raw_products",
+        columns="product_id, product_category_name, product_name_length, product_description_length, product_photos_qty, product_weight_g, product_length_cm, product_height_cm, product_width_cm",
         ddl="""
         CREATE TABLE IF NOT EXISTS {schema}.raw_products (
             product_id                 VARCHAR(64)  NOT NULL,
@@ -161,12 +170,13 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="olist_sellers_dataset.csv",
         table_name="raw_sellers",
+        columns="seller_id, seller_zip_code, seller_city, seller_state",
         ddl="""
         CREATE TABLE IF NOT EXISTS {schema}.raw_sellers (
             seller_id       VARCHAR(64)  NOT NULL,
             seller_zip_code VARCHAR(10),
             seller_city     VARCHAR(100),
-            seller_state    CHAR(2),
+            seller_state    VARCHAR(10),
             _loaded_at      TIMESTAMP    DEFAULT GETDATE()
         )
         DISTSTYLE ALL;
@@ -175,9 +185,10 @@ TABLE_SPECS = [
     TableSpec(
         csv_file="product_category_name_translation.csv",
         table_name="raw_category_translation",
+        columns="product_category_name, product_category_name_english",
         ddl="""
         CREATE TABLE IF NOT EXISTS {schema}.raw_category_translation (
-            product_category_name         VARCHAR(100),
+            product_category_name        VARCHAR(100),
             product_category_name_english VARCHAR(100),
             _loaded_at                    TIMESTAMP    DEFAULT GETDATE()
         )
@@ -185,7 +196,8 @@ TABLE_SPECS = [
         """,
     ),
 ]
- 
+
+
 # CORE LOGIC
 
 def get_redshift_connection():
@@ -218,15 +230,17 @@ def truncate_and_load(
     cursor.execute(f"TRUNCATE TABLE {table};")
     logger.info(f"  ✓ Truncated {table}")
 
-    # COPY from S3
+    # COPY from S3 with explicit column list and CSV specs
     copy_sql = f"""
-    COPY {table}
+    COPY {table} ({spec.columns})
     FROM '{s3_path}'
     {_auth_clause()}
     REGION '{AWS_REGION}'
-    CSV
+    FORMAT AS CSV
+    QUOTE AS '"'
     IGNOREHEADER 1
     TIMEFORMAT 'auto'
+    DATEFORMAT 'auto'
     BLANKSASNULL
     EMPTYASNULL
     MAXERROR 10;

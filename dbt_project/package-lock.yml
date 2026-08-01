@@ -1,0 +1,6 @@
+packages:
+- package: dbt-labs/dbt_utils
+  version: 1.4.1
+- package: dbt-labs/audit_helper
+  version: 0.14.0
+sha1_hash: 47985e9a87eeba7d11572afe698ad8e6c5357d9e
