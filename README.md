@@ -1,6 +1,4 @@
 # E-Commerce Data Pipeline — End-to-End Analytics Platform
-
-> **Junior Data Engineer Portfolio Project**
 > Stack: Python · dbt · Apache Airflow · Docker · AWS (S3, Redshift, Glue)
 
 ---
@@ -9,6 +7,9 @@
 
 A production-grade data pipeline that ingests raw e-commerce data from the [Brazilian E-Commerce Public Dataset by Olist](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (100k+ real orders), transforms it through a medallion architecture (Bronze → Silver → Gold), and serves analytics-ready tables via a dbt data warehouse on AWS Redshift.
 
+<p align="center">
+  <img src="diagram.png" alt="E-Commerce Data Pipeline diagram" width="1000">
+</p>
 ## Architecture
 
 ```
