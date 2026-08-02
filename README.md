@@ -1,6 +1,10 @@
 # E-Commerce Data Pipeline — End-to-End Analytics Platform
 > Stack: Python · dbt · Apache Airflow · Docker · AWS (S3, Redshift, Glue)
 
+## Link demo
+```bash
+"https://drive.google.com/file/d/1I2pAX8Z9RUEAIgH9_AgfYGGz8qAAMCWl/view?usp=drive_link"
+```
 ---
 
 ##Project Overview
@@ -10,6 +14,7 @@ A production-grade data pipeline that ingests raw e-commerce data from the [Braz
 <p align="center">
   <img src="diagram.png" alt="E-Commerce Data Pipeline diagram" width="1000">
 </p>
+
 ## Architecture
 
 ```
