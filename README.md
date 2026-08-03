@@ -16,7 +16,7 @@ A production-grade data pipeline that ingests raw e-commerce data from the [Braz
 </p>
 
 ## Architecture
-
+![Architecture](achitech.drawio.png)
 ```
 [Olist CSV / Kaggle API]
          │
